@@ -1,22 +1,19 @@
+import { notFound } from "next/navigation";
 import Breadcrumbs from "~/components/Breadcrumbs";
 import WalkForm from "~/components/forms/WalkForm";
 import { api } from "~/trpc/server";
-import { notFound } from "next/navigation";
 
 export default async function Walks({
   params,
 }: {
-  params: Promise<{ collectionId: string; walkId: string }>;
+  params: Promise<{ collectionId: string }>;
 }) {
   const collectionId = Number((await params).collectionId);
-  const id = Number((await params).walkId);
-  const walk = await api.walk.getById({ id });
+  const collection = await api.walkCollection.getById({ id: collectionId });
 
-  if (!walk) {
+  if (!collection) {
     return notFound();
   }
-
-  const { name, collection } = walk;
 
   return (
     <>
@@ -32,14 +29,14 @@ export default async function Walks({
             link: `/walks/${collection.id}`,
           },
           {
-            label: name,
+            label: "Add New",
           },
         ]}
       />
 
       <div className="prose mt-6">
-        <h1>{name}</h1>
-        <WalkForm collectionId={collectionId} walk={walk} />
+        <h1>Add New Walk - {collection.name}</h1>
+        <WalkForm collectionId={collectionId} />
       </div>
     </>
   );
