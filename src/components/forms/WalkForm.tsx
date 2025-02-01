@@ -20,6 +20,8 @@ import { useRouter } from "next/navigation";
 import { walkSchema } from "~/lib/schemas";
 import type { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import MapImage from "~/components/MapImage";
+import { slugify } from "~/lib/slugify";
 
 const WalkForm = ({
   collectionId,
@@ -41,6 +43,7 @@ const WalkForm = ({
       distance: walk?.distance ?? 0,
       order: walk?.order ?? 0,
       circular: walk?.circular ?? false,
+      url: walk?.url ?? "",
     },
   });
 
@@ -83,7 +86,32 @@ const WalkForm = ({
             <FormItem>
               <FormLabel>Slug</FormLabel>
               <FormControl>
-                <Input placeholder="Slug" {...field} />
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() =>
+                      form.setValue("slug", slugify(form.getValues("name")))
+                    }
+                    variant="outline"
+                    type="button"
+                  >
+                    Generate
+                  </Button>
+                  <Input placeholder="Slug" {...field} />
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="url"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>URL</FormLabel>
+              <FormControl>
+                <Input placeholder="URL" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -139,6 +167,8 @@ const WalkForm = ({
             </FormItem>
           )}
         />
+
+        <MapImage />
 
         <Button disabled={isPending} className="self-start" type="submit">
           Save

@@ -11,8 +11,12 @@ export default async function Walks() {
   const data = collections.map((c) => ({
     id: c.id,
     name: c.name,
+    slug: c.slug,
     walks: c.walks.length,
-    distance: c.walks.reduce((distance, walk) => distance + walk.distance, 0),
+    distance: c.walks.reduce(
+      (distance, walk) => distance + (walk.distance ?? 0),
+      0,
+    ),
     link: `/walks/${c.id}`,
   }));
 

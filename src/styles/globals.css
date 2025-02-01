@@ -28,4 +28,6 @@
 
 .prose {
   @apply max-w-none;
+  @apply prose-zinc;
+  @apply prose-invert;
 }

@@ -18,7 +18,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${GeistSans.variable}`}>
+    <html lang="en" className={`${GeistSans.variable} dark`}>
       <body>
         <TRPCReactProvider>
           <SidebarProvider>
@@ -26,7 +26,7 @@ export default function RootLayout({
               <Sidebar />
               <div className="flex flex-1 flex-col overflow-hidden">
                 <Header />
-                <main className="flex-1 overflow-y-auto bg-gray-100 p-6 py-10">
+                <main className="flex-1 overflow-y-auto bg-zinc-900 p-6 py-10">
                   <div className="mx-auto max-w-[1000px]">{children}</div>
                 </main>
               </div>

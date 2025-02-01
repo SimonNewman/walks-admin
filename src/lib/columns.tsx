@@ -8,6 +8,7 @@ import { Button } from "~/components/ui/button";
 export const walkCollectionsColumns: ColumnDef<{
   id: number;
   name: string;
+  slug: string;
   link: ReactNode;
 }>[] = [
   {
@@ -18,6 +19,10 @@ export const walkCollectionsColumns: ColumnDef<{
         {row.getValue("name")}
       </Link>
     ),
+  },
+  {
+    accessorKey: "slug",
+    header: "Slug",
   },
   {
     accessorKey: "walks",
@@ -59,6 +64,10 @@ export const walkColumns: ColumnDef<{
         {row.getValue("name")}
       </Link>
     ),
+  },
+  {
+    accessorKey: "slug",
+    header: "Slug",
   },
   {
     accessorKey: "distance",

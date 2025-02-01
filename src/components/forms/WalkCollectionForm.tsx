@@ -8,17 +8,18 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
+import type { Walk, WalkCollection } from "@prisma/client";
 
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import type { Walk, WalkCollection } from "@prisma/client";
-import { useForm } from "react-hook-form";
-import type { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { walkCollectionSchema } from "~/lib/schemas";
 import { Textarea } from "~/components/ui/textarea";
 import { api } from "~/trpc/react";
+import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import { walkCollectionSchema } from "~/lib/schemas";
+import type { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { slugify } from "~/lib/slugify";
 
 const WalkCollectionForm = ({
   collection,
@@ -34,6 +35,7 @@ const WalkCollectionForm = ({
       name: collection?.name ?? "",
       slug: collection?.slug ?? "",
       description: collection?.description ?? "",
+      url: collection?.url ?? "",
     },
   });
 
@@ -74,7 +76,32 @@ const WalkCollectionForm = ({
             <FormItem>
               <FormLabel>Slug</FormLabel>
               <FormControl>
-                <Input placeholder="Slug" {...field} />
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() =>
+                      form.setValue("slug", slugify(form.getValues("name")))
+                    }
+                    variant="outline"
+                    type="button"
+                  >
+                    Generate
+                  </Button>
+                  <Input placeholder="Slug" {...field} />
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="url"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>URL</FormLabel>
+              <FormControl>
+                <Input placeholder="URL" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

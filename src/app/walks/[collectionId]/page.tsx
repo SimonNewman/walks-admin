@@ -24,6 +24,7 @@ export default async function Walks({
   const tableWalks = walks.map((w) => ({
     id: w.id,
     name: w.name,
+    slug: w.slug,
     distance: w.distance,
     link: `/walks/${id}/${w.id}`,
   }));

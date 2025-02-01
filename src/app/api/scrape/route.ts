@@ -1,5 +1,7 @@
-import type { NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import OpenAI from "openai";
+import { slugify } from "~/lib/slugify";
+import { db } from "~/server/db";
 
 const getMdUrl = (url: string) => `https://r.jina.ai/${url}`;
 
@@ -386,7 +388,7 @@ const getMdUrl = (url: string) => `https://r.jina.ai/${url}`;
 
 // ![Image 48](https://bat.bing.com/action/0?ti=355022723&tm=gtm002&Ver=2&mid=d3cd7b88-c330-4b13-ae8d-2c1bc03dbb5a&bo=1&sid=b57ea900dca511ef8e0103f6db388e1d&vid=b57ec3c0dca511efad0929d37f2347ac&vids=1&msclkid=N&uach=pv%3D10.0&pi=918639831&lg=en-US&sw=800&sh=600&sc=24&tl=Homepage%20-%20Source&p=https%3A%2F%2Fnews.microsoft.com%2Fsource&r=&lt=8835&evt=pageLoad&sv=1&cdb=AQAQ&rn=540617)`;
 
-const getNewsArticleUrls = async (md: string) => {
+const getWalkCollection = async (md: string) => {
   const openai = new OpenAI({
     baseURL: "https://openrouter.ai/api/v1",
     apiKey: process.env.OPENROUTER_API_KEY,
@@ -418,7 +420,7 @@ const getNewsArticleUrls = async (md: string) => {
               description:
                 "The name of the trail that the walks are part of. For example, 'Millenium Way' or 'The Cotswold Way'",
             },
-            summary: {
+            description: {
               type: "string",
               description:
                 "A 75 word summary of the walk collection using language that is matter of fact but slightly fun that would entice the reader to want to complete the walks. Use the trail name in the summary.",
@@ -428,33 +430,37 @@ const getNewsArticleUrls = async (md: string) => {
               items: {
                 type: "object",
                 properties: {
-                  number: {
-                    type: "number",
-                    description: "The number of the walk, starting with 1",
-                  },
                   name: {
                     type: "string",
-                    description: "The name of the walk",
+                    description:
+                      "The name of the individual walk. Do not include any other information such as distance",
                   },
                   url: {
                     type: "string",
                     description: "The URL of the indiviudal walk",
                   },
                 },
-
-                required: ["number", "name", "url"],
+                required: ["name", "url"],
                 additionalProperties: false,
               },
             },
           },
-          required: ["name", "summary", "walks"],
+          required: ["name", "description", "walks"],
           additionalProperties: false,
         },
       },
     },
   });
 
-  return response;
+  if (response.choices[0]?.message?.content) {
+    return JSON.parse(response.choices[0].message.content) as {
+      name: string;
+      description: string;
+      walks: { name: string; url: string }[];
+    };
+  }
+
+  throw new Error("Failed to retrieve walk collection data from OpenAI.");
 };
 
 export async function GET(request: NextRequest) {
@@ -467,15 +473,28 @@ export async function GET(request: NextRequest) {
 
   const mdUrl = getMdUrl(url);
   const mdRes = await fetch(mdUrl);
+
   const md = await mdRes.text();
 
-  const res = await getNewsArticleUrls(md);
-  // const json = await res.json();
+  const { name, description, walks } = await getWalkCollection(md);
 
-  // if (json?.error) {
-  //   return Response.json(json.error);
-  // }
+  const collection = await db.walkCollection.create({
+    data: {
+      name,
+      slug: slugify(name),
+      description,
+      url,
+    },
+  });
 
-  // const content = JSON.parse(json.choices[0].message.content);
-  return Response.json(JSON.parse(res.choices[0]?.message?.content));
+  await db.walk.createMany({
+    data: walks.map(({ name, url }) => ({
+      name,
+      slug: slugify(name),
+      url,
+      collectionId: collection.id,
+    })),
+  });
+
+  return NextResponse.json(collection);
 }
