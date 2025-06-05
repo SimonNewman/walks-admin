@@ -19,14 +19,12 @@ export const walkRouter = createTRPCRouter({
       });
     }),
 
-  getById: publicProcedure
-    .input(z.object({ id: z.number() }))
-    .query(({ ctx, input }) => {
-      return ctx.db.walk.findUnique({
-        where: { id: input.id },
-        include: { collection: true },
-      });
-    }),
+  getById: publicProcedure.input(z.number()).query(({ ctx, input }) => {
+    return ctx.db.walk.findUnique({
+      where: { id: input },
+      include: { collection: true },
+    });
+  }),
 
   // getAll: publicProcedure.query(async ({ ctx }) => {
   //   const collections = await ctx.db.walkCollection.findMany();

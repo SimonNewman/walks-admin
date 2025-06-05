@@ -1,3 +1,4 @@
+import { time } from "console";
 import { z } from "zod";
 
 export const generateWalkCollectionSchema = z.object({
@@ -22,4 +23,7 @@ export const walkSchema = z.object({
   order: z.number().optional(),
   circular: z.boolean(),
   url: z.string(),
+  gpx: z.string().optional(),
+  stiles: z.number().optional(),
+  time: z.number().optional(),
 });

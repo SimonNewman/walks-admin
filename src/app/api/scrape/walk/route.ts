@@ -1,5 +1,7 @@
-import type { NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import OpenAI from "openai";
+import { db } from "~/server/db";
+import { api } from "~/trpc/server";
 
 const getMdUrl = (url: string) => `https://r.jina.ai/${url}`;
 
@@ -34,7 +36,7 @@ const getSingleWalk = async (md: string) => {
               type: "string",
               description: "The name of the walk",
             },
-            summary: {
+            description: {
               type: "string",
               description:
                 "A 75-100 word summary of the walk using language that is matter of fact but slightly fun that would entice the reader to want to complete the walk. Use the walk name in the summary. It could include the location of the walk, the type of terrain, and any interesting features, sites and points of interest.",
@@ -71,7 +73,7 @@ const getSingleWalk = async (md: string) => {
           },
           required: [
             "name",
-            "summary",
+            "description",
             "distance",
             "parking",
             "osMap",
@@ -85,22 +87,53 @@ const getSingleWalk = async (md: string) => {
     },
   });
 
-  return response;
+  if (response.choices[0]?.message?.content) {
+    return JSON.parse(response.choices[0].message.content) as {
+      name: string;
+      description: string;
+      distance?: number;
+      parking?: string;
+      osMap?: string;
+      time?: number;
+      stiles?: number;
+      gpx?: string;
+    };
+  }
+
+  throw new Error("Failed to retrieve walk data from OpenAI.");
 };
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
-  const url = searchParams.get("url");
+  const id = Number(searchParams.get("id"));
 
-  if (!url) {
-    return new Response("url is required", { status: 400 });
+  if (!id) {
+    return new Response("id is required", { status: 400 });
   }
 
-  const mdUrl = getMdUrl(url);
+  const walk = await api.walk.getById(id);
+
+  if (!walk) {
+    return new Response("Walk not found", { status: 400 });
+  }
+
+  const mdUrl = getMdUrl(walk.url);
   const mdRes = await fetch(mdUrl);
   const md = await mdRes.text();
 
-  const res = await getSingleWalk(md);
+  const walkJson = await getSingleWalk(md);
 
-  return Response.json(JSON.parse(res.choices[0]?.message?.content));
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { name, ...walkData } = walkJson;
+
+  const updatedWalk = await db.walk.update({
+    where: {
+      id,
+    },
+    data: {
+      ...walkData,
+    },
+  });
+
+  return NextResponse.json(updatedWalk);
 }

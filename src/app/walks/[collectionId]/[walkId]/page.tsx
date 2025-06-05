@@ -10,7 +10,7 @@ export default async function Walks({
 }) {
   const collectionId = Number((await params).collectionId);
   const id = Number((await params).walkId);
-  const walk = await api.walk.getById({ id });
+  const walk = await api.walk.getById(id);
 
   if (!walk) {
     return notFound();

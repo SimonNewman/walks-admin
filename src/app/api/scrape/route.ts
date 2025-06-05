@@ -4,10 +4,6 @@ import { slugify } from "~/lib/slugify";
 import { db } from "~/server/db";
 
 const getMdUrl = (url: string) => `https://r.jina.ai/${url}`;
-
-// URL Source: https://news.microsoft.com/source
-
-// Markdown Content:
 // Homepage - Source
 // ===============
 
@@ -473,7 +469,6 @@ export async function GET(request: NextRequest) {
 
   const mdUrl = getMdUrl(url);
   const mdRes = await fetch(mdUrl);
-
   const md = await mdRes.text();
 
   const { name, description, walks } = await getWalkCollection(md);

@@ -41,9 +41,12 @@ const WalkForm = ({
       description: walk?.description ?? "",
       collectionId: walk?.collectionId ?? collectionId,
       distance: walk?.distance ?? 0,
+      stiles: walk?.stiles ?? undefined,
+      gpx: walk?.gpx ?? "",
       order: walk?.order ?? 0,
       circular: walk?.circular ?? false,
       url: walk?.url ?? "",
+      time: walk?.time ?? undefined,
     },
   });
 
@@ -120,6 +123,20 @@ const WalkForm = ({
 
         <FormField
           control={form.control}
+          name="gpx"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>GPX URL</FormLabel>
+              <FormControl>
+                <Input placeholder="GPX URL" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
           name="description"
           render={({ field }) => (
             <FormItem>
@@ -141,6 +158,44 @@ const WalkForm = ({
               <FormControl>
                 <Input
                   placeholder="Distance"
+                  type="number"
+                  {...field}
+                  onChange={(e) => field.onChange(Number(e.target.value))}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="time"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Time (Hours)</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Time (Hours)"
+                  type="number"
+                  {...field}
+                  onChange={(e) => field.onChange(Number(e.target.value))}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="stiles"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Stiles</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Stiles"
                   type="number"
                   {...field}
                   onChange={(e) => field.onChange(Number(e.target.value))}
