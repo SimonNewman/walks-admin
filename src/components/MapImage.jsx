@@ -6,7 +6,7 @@ import { xml2js } from "xml-js";
 
 import mapboxPolyline from "@mapbox/polyline";
 
-const MapImage = ({ linear = false, file = "" }) => {
+const MapImage = ({ isCircular = false, file = "" }) => {
   // const mapboxPolyline = require("@mapbox/polyline")
   const [imageUrl, setImageUrl] = useState("");
   const [gpx, setGpx] = useState(file);
@@ -38,7 +38,7 @@ const MapImage = ({ linear = false, file = "" }) => {
     let url = `
     https://api.jawg.io/static?size=1200x800&layer=ab2a0137-3629-4bb8-a255-7b29f3001480&format=png&access-token=uWEREKMqd4C0mbhGOp3bJU9TlflX6sdzLxNGRN7jEEchj9X4Q8qgMpK6mtQBOJ5n&path=color:166534,weight:26%7C${polyline}&path=color:4ade80,weight:13%7C${polyline}&path=color:166534,weight:40%7C${start}%7C${start}&path=color:4ade80,weight:26%7C${start}%7C${start}
 `;
-    if (linear) {
+    if (!isCircular) {
       url += `&path=color:166534,weight:40%7C${finish}&path=color:4ade80,weight:26%7C52.035905,-1.862557%7C${finish}`;
     }
 
