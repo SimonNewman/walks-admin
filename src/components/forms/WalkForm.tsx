@@ -223,7 +223,7 @@ const WalkForm = ({
           )}
         />
 
-        <MapImage />
+        <MapImage isCircular={form.watch("circular")} />
 
         <Button disabled={isPending} className="self-start" type="submit">
           Save
