@@ -1,10 +1,10 @@
+import Link from "next/link";
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
@@ -14,12 +14,7 @@ import sidebarItems from "~/config/sidebar";
 
 const AdminSidebar = () => {
   return (
-    <Sidebar>
-      <SidebarHeader>
-        <div className="flex h-14 items-center justify-center text-xl font-bold">
-          Peak Paths
-        </div>
-      </SidebarHeader>
+    <Sidebar className="bg-zinc-50" collapsible="icon">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Main Menu</SidebarGroupLabel>
@@ -28,10 +23,10 @@ const AdminSidebar = () => {
               {sidebarItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a href={item.href}>
-                      <item.icon className="mr-2 h-4 w-4" />
+                    <Link href={item.href}>
+                      <item.icon />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

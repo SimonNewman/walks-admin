@@ -74,23 +74,32 @@ model VerificationToken {
 }
 
 model WalkCollection {
-  id          BigInt    @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   createdAt   DateTime? @default(now()) @db.Timestamptz(6)
+  description String?
   name        String    @unique
   slug        String    @unique
-  description String?
+  url         String
   walks       Walk[]
 }
 
 model Walk {
-  id           BigInt         @id @default(autoincrement())
-  createdAt    DateTime?      @default(now()) @db.Timestamptz(6)
-  collectionId BigInt
-  name         String
-  distance     Float          @db.Real
-  description  String?
-  slug         String         @unique(map: "walks_slug_key")
-  order        Int?           @db.SmallInt
+  id           Int            @id @default(autoincrement())
   circular     Boolean        @default(true)
-  collection   WalkCollection @relation(fields: [collectionId], references: [id])
+  collection   WalkCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  collectionId Int
+  createdAt    DateTime?      @default(now()) @db.Timestamptz(6)
+  description  String?
+  distance     Float?         @db.Real
+  gpx          String?
+  name         String
+  order        Int?           @db.SmallInt
+  osMap        String?
+  parking      String?
+  slug         String
+  stiles       Int?
+  time         Int?
+  url          String
+
+  @@unique([collectionId, slug], map: "walks_collection_slug_unique")
 }
